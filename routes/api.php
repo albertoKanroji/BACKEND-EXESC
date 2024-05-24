@@ -93,6 +93,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('/{id}', [GroupController::class, 'destroy']);
     });
     Route::prefix('students')->group(function () {
+        Route::post('/login', [StudentController::class, 'login']);
         Route::get('/', [StudentController::class, 'index']);
         Route::post('/', [StudentController::class, 'store']);
         Route::get('/{id}', [StudentController::class, 'show']);

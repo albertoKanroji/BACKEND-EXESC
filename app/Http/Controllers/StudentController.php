@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,73 @@ use Illuminate\Support\Facades\Validator;
 
 class StudentController extends Controller
 {
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 422,
+                'message' => 'Error de validación',
+                'data' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $cliente = Student::where('email', $request->email)->first();
+
+            if (!$cliente) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 401,
+                    'message' => 'Correo electrónico no encontrado',
+                    'data' => null
+                ], 401);
+            }
+
+            if ($cliente->status !== 1) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 403,
+                    'message' => 'Usuario inactivo',
+                    'data' => null
+                ], 403);
+            }
+
+            if (!Hash::check($request->password, $cliente->password)) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 401,
+                    'message' => 'Contraseña incorrecta',
+                    'data' => null
+                ], 401);
+            }
+
+            $token = $cliente->createToken('authToken')->plainTextToken;
+            $modulos = $cliente->modulos()->get(['name', 'uid', 'path']);
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'message' => 'Inicio de sesión exitoso',
+                'data' => [
+                    'cliente' => $cliente,
+                    'token' => $token,
+                    'modulos' => $modulos
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Error al iniciar sesión: ' . $e->getMessage(),
+                'data' => null
+            ]);
+        }
+    }
     public function index()
     {
         try {

@@ -57,14 +57,15 @@ class UsersAdmin extends Controller
             }
 
             $token = $cliente->createToken('authToken')->plainTextToken;
-
+            $modulos = $cliente->modulos()->get(['name', 'uid', 'path']);
             return response()->json([
                 'success' => true,
                 'status' => 200,
                 'message' => 'Inicio de sesión exitoso',
                 'data' => [
                     'cliente' => $cliente,
-                    'token' => $token
+                    'token' => $token,
+                    'modulos' => $modulos
                 ]
             ], 200);
         } catch (\Exception $e) {
