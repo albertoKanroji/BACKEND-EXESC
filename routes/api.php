@@ -91,6 +91,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [GroupController::class, 'show']);
         Route::put('/{id}', [GroupController::class, 'update']);
         Route::delete('/{id}', [GroupController::class, 'destroy']);
+        Route::post('/send-selection', [GroupController::class, 'getGroupByPeriodAndTeacher']);
+        Route::get('/students-group/{groupId}', [GroupController::class, 'getStudentsByGroupId']);
+        Route::get('/students-period/{periodId}', [GroupController::class, 'getStudentsByPeriod']);
+        Route::post('/students-period/', [GroupController::class, 'getStudentsByPeriodAndGroup']);
+        Route::post('/students-by-filter', [GroupController::class, 'getStudentsByPeriodFiltered']);
     });
     Route::prefix('students')->group(function () {
         Route::post('/login', [StudentController::class, 'login']);

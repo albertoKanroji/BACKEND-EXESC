@@ -15,6 +15,6 @@ class Period extends Model
 
     public function groups()
     {
-        return $this->hasMany(Group::class);
+        return $this->hasMany(Group::class, 'periods_id');
     }
 }
