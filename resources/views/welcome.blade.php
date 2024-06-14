@@ -56,7 +56,7 @@
 
 <body class="antialiased">
     <div class="container">
-        <div class="title">API Funcionando</div>
+        <div class="title">Hola mundo | Rey Arturo</div>
         <div class="info">
             <p>Bienvenido a la API de nuestra aplicación. Todo está funcionando correctamente.</p>
             <p>Puedes utilizar los endpoints documentados para interactuar con nuestra API.</p>
