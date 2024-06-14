@@ -102,6 +102,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/', [StudentController::class, 'index']);
         Route::post('/', [StudentController::class, 'store']);
         Route::get('/{id}', [StudentController::class, 'show']);
+        Route::post('/searchByControlNumber', [StudentController::class, 'searchByControlNumber']);
         Route::put('/{id}', [StudentController::class, 'update']);
         Route::delete('/{id}', [StudentController::class, 'destroy']);
     });
