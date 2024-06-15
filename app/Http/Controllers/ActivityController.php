@@ -33,7 +33,7 @@ class ActivityController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:45',
+
             'image' => 'nullable',
             'type_of_activities_id' => 'required|integer|exists:type_of_activities,id'
         ]);
@@ -49,7 +49,14 @@ class ActivityController extends Controller
 
         DB::beginTransaction();
         try {
-            $activity = Activity::create($request->all());
+            $name = $request->input('name');
+            $code = $this->generateCode($name);
+            $activity = Activity::create([
+                'name' => $request->input('name'),
+                'image' => $request->input('image'),
+                'type_of_activities_id' => $request->input('type_of_activities_id'),
+                'code' => $code
+            ]);
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -67,7 +74,30 @@ class ActivityController extends Controller
             ], 500);
         }
     }
+    private function generateCode($name)
+    {
+        // Convertir el nombre a un código base (por ejemplo, convertir a mayúsculas y tomar las primeras letras)
+        $codeBase = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $name), 0, 3));
 
+        // Obtener el último código similar de la base de datos
+        $lastActivity = Activity::where('code', 'like', $codeBase . '%')
+            ->orderBy('code', 'desc')
+            ->first();
+
+        if ($lastActivity) {
+            // Extraer el número del último código y sumar 1
+            $lastNumber = (int)substr($lastActivity->code, strlen($codeBase));
+            $newNumber = $lastNumber + 1;
+        } else {
+            // Si no hay actividades con un código similar, comenzar con 1
+            $newNumber = 1;
+        }
+
+        // Formatear el nuevo número a dos dígitos (01, 02, etc.)
+        $newCode = $codeBase . str_pad($newNumber, 2, '0', STR_PAD_LEFT);
+
+        return $newCode;
+    }
     public function show($id)
     {
         try {
@@ -92,8 +122,8 @@ class ActivityController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
-            'code' => 'sometimes|required|string|max:45',
-            'image' => 'nullable|longtext',
+
+            'image' => 'nullable',
             'type_of_activities_id' => 'sometimes|required|integer|exists:type_of_activities,id'
         ]);
 
