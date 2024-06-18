@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Activity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Group;
 
 class ActivityController extends Controller
 {
@@ -177,6 +178,40 @@ class ActivityController extends Controller
                 'success' => false,
                 'status' => 500,
                 'message' => 'Error al eliminar actividad: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+    public function getActivitiesWithParticipants()
+    {
+        try {
+            $groups = Group::with('students')->get();
+
+            $groupData = $groups->map(function ($group) {
+                $totalParticipants = $group->students->count();
+                $maleParticipants = $group->students->where('gender', 'male')->count();
+                $femaleParticipants = $group->students->where('gender', 'female')->count();
+
+                return [
+                    'id' => $group->id,
+                    'name' => $group->activity->name ?? 'N/A',
+                    'total_participants' => $totalParticipants,
+                    'male_participants' => $maleParticipants,
+                    'female_participants' => $femaleParticipants,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'message' => 'Grupos obtenidos correctamente',
+                'data' => $groupData
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Error al obtener los grupos: ' . $e->getMessage(),
                 'data' => null
             ], 500);
         }
