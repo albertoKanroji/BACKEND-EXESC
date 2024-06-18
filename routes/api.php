@@ -85,23 +85,28 @@ Route::prefix('v1')->group(function () {
         Route::put('/{id}', [TypeOfGroupController::class, 'update']);
         Route::delete('/{id}', [TypeOfGroupController::class, 'destroy']);
     });
+    
     Route::prefix('groups')->group(function () {
         Route::get('/', [GroupController::class, 'index']);
         Route::post('/', [GroupController::class, 'store']);
-        Route::get('/{id}', [GroupController::class, 'show']);
-        Route::put('/{id}', [GroupController::class, 'update']);
+        Route::get('/buscar/{id}', [GroupController::class, 'show']);
+        Route::put('/actualizar/{id}', [GroupController::class, 'update']);
         Route::delete('/{id}', [GroupController::class, 'destroy']);
         Route::post('/send-selection', [GroupController::class, 'getGroupByPeriodAndTeacher']);
         Route::get('/students-group/{groupId}', [GroupController::class, 'getStudentsByGroupId']);
         Route::get('/students-period/{periodId}', [GroupController::class, 'getStudentsByPeriod']);
         Route::post('/students-period/', [GroupController::class, 'getStudentsByPeriodAndGroup']);
         Route::post('/students-by-filter', [GroupController::class, 'getStudentsByPeriodFiltered']);
+        Route::get('/pdf/{periodId}', [GroupController::class, 'generateGroupsPdf']);
+        Route::get('/generate-pdf/{groupId}', [GroupController::class, 'generatePdfStudentsByGroupId']);
+        Route::get('boleta/{studentId}', [GroupController::class, 'getStudentInfo']);
     });
     Route::prefix('students')->group(function () {
         Route::post('/login', [StudentController::class, 'login']);
         Route::get('/', [StudentController::class, 'index']);
         Route::post('/', [StudentController::class, 'store']);
         Route::get('/{id}', [StudentController::class, 'show']);
+        Route::post('/searchByControlNumber', [StudentController::class, 'searchByControlNumber']);
         Route::put('/{id}', [StudentController::class, 'update']);
         Route::delete('/{id}', [StudentController::class, 'destroy']);
     });
@@ -111,6 +116,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [ActivityController::class, 'show']);
         Route::put('/{id}', [ActivityController::class, 'update']);
         Route::delete('/{id}', [ActivityController::class, 'destroy']);
+        Route::get('/pdf', [ActivityController::class, 'getActivitiesWithParticipants']);
     });
     Route::prefix('surveys')->group(function () {
         Route::get('/', [SurveyController::class, 'index']);

@@ -250,4 +250,47 @@ class StudentController extends Controller
             ], 500);
         }
     }
+    public function searchByControlNumber(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'control_number' => 'required|string|max:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 422,
+                'message' => 'Error de validación',
+                'data' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $controlNumber = $request->input('control_number');
+            $student = Student::where('control_number', $controlNumber)->with('career')->first();
+
+            if (!$student) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Estudiante no encontrado',
+                    'data' => null
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'message' => 'Estudiante encontrado correctamente',
+                'data' => $student
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Error al buscar estudiante por número de control: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
 }
