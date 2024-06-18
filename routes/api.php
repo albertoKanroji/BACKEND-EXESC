@@ -85,6 +85,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/{id}', [TypeOfGroupController::class, 'update']);
         Route::delete('/{id}', [TypeOfGroupController::class, 'destroy']);
     });
+    
     Route::prefix('groups')->group(function () {
         Route::get('/', [GroupController::class, 'index']);
         Route::post('/', [GroupController::class, 'store']);
