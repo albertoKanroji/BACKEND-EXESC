@@ -172,20 +172,11 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:students,email,' . $id,
+
             'username' => 'sometimes|required|string|max:255|unique:students,username,' . $id,
-            'password' => 'sometimes|required|string|min:6',
-            'last_name' => 'sometimes|required|string|max:255',
-            'mother_last_name' => 'sometimes|required|string|max:255',
-            'control_number' => 'sometimes|required|string|max:45|unique:students,control_number,' . $id,
-            'status' => 'sometimes|required|integer',
-            'profile_picture' => 'nullable|longtext',
-            'phone' => 'nullable|string|max:10|unique:students,phone,' . $id,
-            'profile' => 'nullable|string|max:45',
-            'semester' => 'sometimes|required|integer',
-            'gender' => 'sometimes|required|string|max:45',
-            'careers_id' => 'sometimes|required|integer|exists:careers,id',
+            'password' => 'sometimes|nullable|string|min:6',
+            'image' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {
