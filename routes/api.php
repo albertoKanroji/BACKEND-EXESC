@@ -77,6 +77,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [TeacherController::class, 'show']);
         Route::put('/{id}', [TeacherController::class, 'update']);
         Route::delete('/{id}', [TeacherController::class, 'destroy']);
+        Route::post('/login', [TeacherController::class, 'login']);
     });
     Route::prefix('types-of-groups')->group(function () {
         Route::get('/', [TypeOfGroupController::class, 'index']);
@@ -99,6 +100,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/pdf/{periodId}', [GroupController::class, 'generateGroupsPdf']);
         Route::get('/generate-pdf/{groupId}', [GroupController::class, 'generatePdfStudentsByGroupId']);
         Route::get('boleta/{studentId}', [GroupController::class, 'getStudentInfo']);
+        Route::get('/students/{studentId}/groups', [GroupController::class, 'getGroupsByStudentId']);
+        Route::get('/teachers/{teacherId}/groups', [GroupController::class, 'getGroupsByTeacherId']);
     });
     Route::prefix('students')->group(function () {
         Route::post('/login', [StudentController::class, 'login']);

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Models\Student;
+use App\Models\Teacher;
 
 class GroupController extends Controller
 {
@@ -269,6 +270,105 @@ class GroupController extends Controller
             ], 500);
         }
     }
+    public function getGroupsByStudentId($studentId)
+    {
+        try {
+            // Buscar el estudiante por su ID junto con los grupos asociados
+            $student = Student::with('groups.activity', 'groups.schedules', 'groups.teacher',)->find($studentId);
+
+            if (!$student) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'No se encontró el estudiante',
+                    'data' => null
+                ], 404);
+            }
+
+            // Obtener los grupos del estudiante
+            $groups = $student->groups->map(function ($group) {
+                return [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                    'location' => $group->location,
+                    'teacher' => $group->teacher->name,
+                    'activity_name' => $group->activity->name, // Asumiendo que tienes una relación con 'activity'
+                    'schedules' => $group->schedules->map(function ($schedule) {
+                        return [
+                            'day' => $schedule->day, // Asumiendo que 'day' es un campo en el modelo Schedule
+                            'start_time' => $schedule->start_time, // Asumiendo que 'start_time' es un campo en el modelo Schedule
+                            'end_time' => $schedule->end_time // Asumiendo que 'end_time' es un campo en el modelo Schedule
+                        ];
+                    })
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'message' => 'Grupos del estudiante obtenidos correctamente',
+                'data' => $groups
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Error al obtener los grupos del estudiante: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+    public function getGroupsByTeacherId($teacherId)
+    {
+        try {
+            // Buscar el maestro por su ID junto con los grupos asociados
+            $teacher = Teacher::with('groups.activity', 'groups.schedules', 'groups.period', 'groups.typeOfGroup')->find($teacherId);
+
+            if (!$teacher) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'No se encontró el maestro',
+                    'data' => null
+                ], 404);
+            }
+
+            // Obtener los grupos del maestro
+            $groups = $teacher->groups->map(function ($group) {
+                return [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                    'location' => $group->location,
+                    'activity_name' => $group->activity->name,
+                    'period' => $group->period->periodscol, // Asumiendo que 'name' es un campo en el modelo Period
+                    'type_of_group' => $group->typeOfGroup->name, // Asumiendo que 'name' es un campo en el modelo TypeOfGroup
+                    'schedules' => $group->schedules->map(function ($schedule) {
+                        return [
+                            'day' => $schedule->day, // Asumiendo que 'day' es un campo en el modelo Schedule
+                            'start_time' => $schedule->start_time, // Asumiendo que 'start_time' es un campo en el modelo Schedule
+                            'end_time' => $schedule->end_time // Asumiendo que 'end_time' es un campo en el modelo Schedule
+                        ];
+                    })
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'message' => 'Grupos del maestro obtenidos correctamente',
+                'data' => $groups
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Error al obtener los grupos del maestro: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+
+
     public function getStudentInfo($studentId)
     {
         try {

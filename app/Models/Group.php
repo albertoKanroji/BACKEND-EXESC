@@ -34,7 +34,7 @@ class Group extends Model
 
     public function schedules()
     {
-        return $this->belongsToMany(Schedule::class, 'group_schedules');
+        return $this->belongsToMany(Schedule::class, 'group_schedules', 'groups_id', 'schedules_id');
     }
     // En el modelo Group
     public function students()
