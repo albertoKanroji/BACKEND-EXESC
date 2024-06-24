@@ -11,6 +11,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\Schedule;
 
 class GroupController extends Controller
 {
@@ -44,7 +45,9 @@ class GroupController extends Controller
             'activities_id' => 'required|integer|exists:activities,id',
             'type_of_groups_id' => 'required|integer|exists:type_of_groups,id',
             'schedules' => 'required|array',
-            'schedules.*' => 'integer|exists:schedules,id',
+            'schedules.*.day' => 'required|string',
+            'schedules.*.start_time' => 'required|date_format:H:i',
+            'schedules.*.end_time' => 'required|date_format:H:i',
         ]);
 
         if ($validator->fails()) {
@@ -58,8 +61,21 @@ class GroupController extends Controller
 
         DB::beginTransaction();
         try {
-            $group = Group::create($request->all());
-            $group->schedules()->sync($request->schedules);
+            // Crear el grupo
+            $group = Group::create($request->only([
+                'quota_limit', 'location', 'periods_id', 'teachers_id', 'activities_id', 'type_of_groups_id'
+            ]));
+
+            // Crear los registros de schedules y asociarlos con el grupo
+            $scheduleIds = [];
+            foreach ($request->schedules as $scheduleData) {
+                $schedule = Schedule::create($scheduleData);
+                $scheduleIds[] = $schedule->id;
+            }
+
+            // Asociar los schedules al grupo
+            $group->schedules()->sync($scheduleIds);
+
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -77,6 +93,7 @@ class GroupController extends Controller
             ], 500);
         }
     }
+
 
     public function show($id)
     {
@@ -108,7 +125,9 @@ class GroupController extends Controller
             'activities_id' => 'required|integer|exists:activities,id',
             'type_of_groups_id' => 'required|integer|exists:type_of_groups,id',
             'schedules' => 'required|array',
-            'schedules.*' => 'integer|exists:schedules,id',
+            'schedules.*.day' => 'required|string',
+            'schedules.*.start_time' => 'required|date_format:H:i:s',
+            'schedules.*.end_time' => 'required|date_format:H:i:s',
         ]);
 
         if ($validator->fails()) {
@@ -123,8 +142,21 @@ class GroupController extends Controller
         DB::beginTransaction();
         try {
             $group = Group::findOrFail($id);
-            $group->update($request->all());
-            $group->schedules()->sync($request->schedules);
+            $group->update($request->only([
+                'quota_limit', 'location', 'periods_id', 'teachers_id', 'activities_id', 'type_of_groups_id'
+            ]));
+
+            // Eliminar los horarios antiguos del grupo
+            $group->schedules()->detach();
+
+            // Crear los nuevos horarios y asociarlos al grupo
+            $scheduleIds = [];
+            foreach ($request->schedules as $scheduleData) {
+                $schedule = Schedule::create($scheduleData);
+                $scheduleIds[] = $schedule->id;
+            }
+            $group->schedules()->sync($scheduleIds);
+
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -142,6 +174,7 @@ class GroupController extends Controller
             ], 500);
         }
     }
+
 
     public function destroy($id)
     {

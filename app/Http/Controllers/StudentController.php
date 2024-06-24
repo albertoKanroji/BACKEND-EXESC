@@ -172,11 +172,9 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-
             'username' => 'sometimes|required|string|max:255|unique:students,username,' . $id,
-            'password' => 'sometimes|nullable|string|min:6',
+            'password' => 'nullable|string|min:6',
             'image' => 'nullable',
-
         ]);
 
         if ($validator->fails()) {
@@ -191,12 +189,10 @@ class StudentController extends Controller
         DB::beginTransaction();
         try {
             $student = Student::findOrFail($id);
-            $data = $request->all();
+            $data = $request->only(['username', 'image']); // Solo toma los campos 'username' e 'image'
 
             if ($request->has('password')) {
-                $data['password'] = Hash::make($request->password); // Encriptar la contraseña
-            } else {
-                unset($data['password']);
+                $data['password'] = Hash::make($request->password); // Encripta la nueva contraseña
             }
 
             $student->update($data);
@@ -217,6 +213,7 @@ class StudentController extends Controller
             ], 500);
         }
     }
+
 
     public function destroy($id)
     {
