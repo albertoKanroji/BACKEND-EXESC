@@ -126,8 +126,8 @@ class GroupController extends Controller
             'type_of_groups_id' => 'required|integer|exists:type_of_groups,id',
             'schedules' => 'required|array',
             'schedules.*.day' => 'required|string',
-            'schedules.*.start_time' => 'required|date_format:H:i:s',
-            'schedules.*.end_time' => 'required|date_format:H:i:s',
+            'schedules.*.start_time' => 'required',
+            'schedules.*.end_time' => 'required',
         ]);
 
         if ($validator->fails()) {

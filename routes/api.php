@@ -16,6 +16,8 @@ use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\SurveyResponseController;
+use App\Http\Controllers\ManagersController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -86,7 +88,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/{id}', [TypeOfGroupController::class, 'update']);
         Route::delete('/{id}', [TypeOfGroupController::class, 'destroy']);
     });
-    
+
     Route::prefix('groups')->group(function () {
         Route::get('/', [GroupController::class, 'index']);
         Route::post('/', [GroupController::class, 'store']);
@@ -127,6 +129,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [SurveyController::class, 'show']);
         Route::put('/{id}', [SurveyController::class, 'update']);
         Route::delete('/{id}', [SurveyController::class, 'destroy']);
+    });
+    Route::prefix('managers')->group(function () {
+        Route::get('/', [ManagersController::class, 'index']);
+        Route::post('/', [ManagersController::class, 'store']);
+        Route::get('/{id}', [ManagersController::class, 'show']);
+        Route::put('/{id}', [ManagersController::class, 'update']);
+        Route::delete('/{id}', [ManagersController::class, 'destroy']);
     });
     Route::prefix('questions')->group(function () {
         Route::get('/', [QuestionController::class, 'index']);

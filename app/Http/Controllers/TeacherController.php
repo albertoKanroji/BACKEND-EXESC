@@ -112,10 +112,10 @@ class TeacherController extends Controller
             'curp' => 'sometimes|required|string|max:45|unique:teachers,curp,' . $id,
             'rfc' => 'sometimes|required|string|max:45|unique:teachers,rfc,' . $id,
             'username' => 'sometimes|required|string|max:45|unique:teachers,username,' . $id,
-            'password' => 'sometimes|required|string|min:6',
+            'password' => 'nullable|string|min:6',
             'email' => 'sometimes|required|string|email|max:255|unique:teachers,email,' . $id,
-            'profile_picture' => 'nullable|longtext',
-            'signature' => 'nullable|longtext',
+            'profile_picture' => 'nullable',
+            'signature' => 'nullable',
             'profile' => 'nullable|string|max:45',
             'departments_id' => 'sometimes|required|integer|exists:departments,id'
         ]);
